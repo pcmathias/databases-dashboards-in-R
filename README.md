@@ -1,2 +1,3 @@
-# databases-dashboards-in-R
-Databases and Dashboards in R
+# Databases and Dashboards in R
+
+This course covers basic concepts on relational databases, parsing files, dashboards, and interactive visualizations using the R programming language.
