@@ -1,0 +1,231 @@
+---
+title: "Lesson 3 Draft"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(DBI)
+library(RSQLite)
+library(janitor)
+# install.packages(c("DBI", "RSQLite"))
+```
+
+The setup chunk is used to set up your environment as well as your R Markdown document. Add all the packages you need for later code in the document.
+
+## Import Data
+
+Next we are going to import a single peak, sample, and batch file. These data will be used to create different tables in our database.
+
+```{r import}
+batch_file <- read_csv("data/2017-01-06_b.csv") %>% 
+  clean_names()
+sample_file <- read_csv("data/2017-01-06_s.csv") %>% 
+  clean_names()
+peak_file <- read_csv("data/2017-01-06_p.csv") %>% 
+  clean_names()
+```
+
+## Connect to DB
+
+The `dbConnect()` function establishes connections to existing database or creates a database
+```{r example_connection, eval=FALSE}
+connection_object <- dbConnect(driver_function, additional_options)
+```
+
+If a SQLite file doesn't exist in the working directory, R will create a file. It's also possible to create a SQLite database in memory (i.e. not saved to the hard drive) by using ":memory:" as the dbname (in quotes).
+
+```{r example_SQLite_connection, eval=FALSE}
+connection_object <- dbConnect(drv = RSQLite::SQLite(), 
+                               dbname = "file_name.sqlite")
+```
+
+Other types of database may require a significant amount of information to establish a connection. For example, many types of databases require connecting to a separate external server and supplying access credentials.
+
+```{r example_PostgreSQL_connection, eval=FALSE}
+con <- DBI::dbConnect(odbc::odbc(),
+  driver = "PostgreSQL Driver",
+  database = "test_db",
+  UID    = rstudioapi::askForPassword("Database user"),
+  PWD    = rstudioapi::askForPassword("Database password"),
+  host = "localhost",
+  port = 5432)
+```
+
+## Exercise 2
+
+We will build a SQLite database to store our course mass spec data.
+
+1. Create a new SQLite database in a file called "project_data.sqlite" and name the connection object projectdb.
+2. Create 3 tables - batch, sample, and peak - that correspond to each of the 3 types of files that exist in our data set.
+3. Use the `dbListTables()` function to confirm that the 3 tables have been created.
+
+```{r build_db}
+# initialize database connection
+# for SQLite, file is created if it doesn't exist
+projectdb <- dbConnect(RSQLite::SQLite(), "project_data.sqlite")
+```
+
+```{r write_table}
+# write tables
+dbWriteTable(projectdb, "batch", batch_file)
+dbWriteTable(projectdb, "sample", sample_file)
+dbWriteTable(projectdb, "peak", peak_file)
+# confirm tables
+dbListTables(projectdb)
+```
+
+## Disconnect from database
+
+When not actively using database, disconnect.
+
+```{r}
+# disconnect from database
+dbDisconnect(projectdb)
+```
+
+After the database connection has been closed, you need to re-connect to continue interacting with it.
+
+```{r}
+# connect to database - file exists
+projectdb <- dbConnect(RSQLite::SQLite(), "project_data.sqlite")
+```
+
+## Read Data
+
+To connect with individual tables within a database, use the `tbl()` function. This will create a table object on which you can query and perform data manipulation. However, the data itself will not be available in your environment until you execute a function that forces retrieval of the data.
+
+```{r}
+# access a table
+batch_sql <- tbl(projectdb, "batch")
+head(batch_sql, 10) # head function will retrive first rows
+```
+
+## Exercise 3
+
+Confirm the data that you expect to see is available in the sample and peak tables of your project database. Create table connection objects and view the first 10 rows of each.
+
+```{r}
+# connect other tables
+sample_sql <- tbl(projectdb, "sample")
+head(sample_sql, 10)
+peak_sql <- tbl(projectdb, "peak")
+head(peak_sql, 10)
+```
+
+## dplyr Functions
+
+The `dbplyr` package works in the backend to translate standard `dpylr` code into database queries without additional effort.
+
+Simple functions such as `select()` and `filter()` were inspired by standard SQL queries. `select()` has the same behavior as its SQL namesake - it captures specific variables of interest.
+
+```{r}
+sample_subset <- select(sample_sql, # data set from db table
+                        batch_name, sample_name, compound_name, sample_type, ion_ratio)
+head(sample_subset, 10)
+```
+
+The `filter()` function works similarly to a WHERE clause in a SQL query. The argument of the function includes logical criteria to determine which rows should be captured and included.
+
+```{r}
+batch_subset <- filter(batch_sql, compound_name == "morphine")
+head(batch_subset, 10)
+```
+
+Pipes can be a helpful tool that allow you to execute multiple functions in sequence.
+
+```{r}
+sample_subset <- sample_sql |>
+  filter(sample_type == "standard") |> 
+  select(sample_name, compound_name, concentration, expected_concentration)
+head(sample_subset, 20)
+```
+
+
+## Exercise 4
+
+We are interested in visualizing the distribution of non-zero concentrations for our unknown samples in the data set.
+
+1. Create an object sample_subset that includes only the sample data for samples with a sample_type of "unknown" and a concentration that is greater than 0. We are only interested in capturing the following variables: batch_name, sample_name, compound_name, sample_type, concentration.
+2. Review the first 20 rows from your data set to confirm the rows in your data set meet your inclusion criteria.
+3. Using the `ggplot()` function, create a plot that contains the histograms of concentrations (suggested binwidth = 10) faceted by compound_name.
+
+```{r}
+sample_subset <- sample_sql |> 
+  filter(sample_type == "unknown", concentration > 0) |>
+  select(batch_name, sample_name, compound_name, sample_type, concentration)
+head(sample_subset, 20)
+```
+
+```{r}
+ggplot(sample_subset) +
+  geom_histogram(aes(x = concentration), binwidth = 10) +
+  facet_grid(compound_name ~ .)
+```
+
+## Collect Function
+
+While there are advantages to limiting the data in your environment, it may be more convenient to retrieve data from your database into working memory within R. The `collect()` function allows you
+```{r}
+sample_subset <- sample_sql |> 
+  filter(sample_type == "unknown", compound_name == "oxycodone") |> 
+  select(batch_name, sample_name, compound_name, sample_type, concentration) |> 
+  collect()
+```
+
+## Join Functions
+
+Join batch and sample tables to integrate batch and sample level details. In this example we may want to see if any of the batch reviewers have different rates of failing samples compared to one another. We use `left_join()` with the batch table as our reference table to ensure that there will be at least one row for every row in our batch table. 
+
+```{r}
+batch_sample <- left_join(batch_sql, sample_sql, by = c("batch_name", "compound_name"))
+```
+
+We use `collect()` to bring the data frame into our environment if we plan to use functions that won't retrieve the data. Table and summary functions may require this.
+
+First run `summary()` on the batch_sample object after joining without collecting.
+
+```{r}
+summary(batch_sample)
+```
+
+Now use `collect()` to bring the data into the environment and then run `summary()`.
+
+```{r}
+batch_sample <- left_join(batch_sql, sample_sql, by = c("batch_name", "compound_name")) |> 
+  collect()
+summary(batch_sample)
+```
+
+Table functions work similar and need the data in the environment.
+
+```{r}
+table(batch_sample$reviewer_name, batch_sample$sample_passed)
+# tabyl(batch_sample, reviewer_name, sample_passed) # alternate function to generate data frame
+```
+
+The peak table has data for internal standards which have different compound names than our analytes of interest. Here we use a full join and visualize the output to show that the IS data is retained.
+
+```{r}
+sample_peak_with_IS <- full_join(sample_sql, peak_sql, c("batch_name", "sample_name", "compound_name")) |> 
+  collect() |> 
+  View()
+```
+
+## Exercise 5
+
+We are interested in investigating the acceptance criteria for peak areas for our quantifier and qualifier data. We would like to focus on the standards with an expected concentration of 100 and review the peak area distributions for both quant and qual data. We are going to only focus on the compounds of interest and not internal standard data (internal standards use a different compound_name). Use filter to subset the sample data to only standards with an expected concentration of 100 and then join the sample and peak tables. Plot histograms of the peak areas for quantifier and qualifier ions (separately).
+
+```{r}
+sample_standards <- sample_sql |> 
+  filter(sample_type == "standard", expected_concentration == 100)
+sample_peak_standards <- left_join(sample_standards, peak_sql, by = c("batch_name", "sample_name", "compound_name"))
+```
+
+```{r}
+ggplot(sample_peak_standards, aes(peak_area)) +
+  geom_histogram(binwidth = 1000) +
+  facet_grid(chromatogram_name ~ .)
+```
+
