@@ -3,6 +3,12 @@ title: "Lesson 3 Draft"
 output: html_document
 ---
 
+## Exercise 1
+
+1. Open the R Markdown file for this lesson: “03 – Databases in R.Rmd”
+2. Run the “setup” chunk of the file. This will ensure the packages we need for this lesson are loaded into our environment. If you receive an error because you weren’t able to load the required packages prior to the course, copy the install.package(c(“DBI”, “odbc”)) that is commented out of the setup chunk into your console and execute it.
+3. Run the “import” chunk next. For the other exercises in this lesson we will be using a subset of the peak, sample, and batch data sets to build and query our database.
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
@@ -13,8 +19,6 @@ library(janitor)
 ```
 
 The setup chunk is used to set up your environment as well as your R Markdown document. Add all the packages you need for later code in the document.
-
-## Import Data
 
 Next we are going to import a single peak, sample, and batch file. These data will be used to create different tables in our database.
 
@@ -64,16 +68,16 @@ We will build a SQLite database to store our course mass spec data.
 ```{r build_db}
 # initialize database connection
 # for SQLite, file is created if it doesn't exist
-projectdb <- dbConnect(RSQLite::SQLite(), "project_data.sqlite")
+......... <- .........
 ```
 
 ```{r write_table}
 # write tables
-dbWriteTable(projectdb, "batch", batch_file)
-dbWriteTable(projectdb, "sample", sample_file)
-dbWriteTable(projectdb, "peak", peak_file)
+dbWriteTable(........., ......., ..........)
+...
+...
 # confirm tables
-dbListTables(projectdb)
+...
 ```
 
 ## Disconnect from database
@@ -108,10 +112,10 @@ Confirm the data that you expect to see is available in the sample and peak tabl
 
 ```{r}
 # connect other tables
-sample_sql <- tbl(projectdb, "sample")
-head(sample_sql, 10)
-peak_sql <- tbl(projectdb, "peak")
-head(peak_sql, 10)
+sample_sql <- ...
+...
+peak_sql <- ...
+...
 ```
 
 ## dplyr Functions
@@ -153,15 +157,15 @@ We are interested in visualizing the distribution of non-zero concentrations for
 
 ```{r}
 sample_subset <- sample_sql |> 
-  filter(sample_type == "unknown", concentration > 0) |>
-  select(batch_name, sample_name, compound_name, sample_type, concentration)
-head(sample_subset, 20)
+  ... |>
+  ...
+...
 ```
 
 ```{r}
-ggplot(sample_subset) +
-  geom_histogram(aes(x = concentration), binwidth = 10) +
-  facet_grid(compound_name ~ .)
+ggplot(.............) +
+  geom_histogram(aes(x = ..........), ........ = ..) +
+  facet_grid(... ~ ...)
 ```
 
 ## Collect Function
@@ -217,15 +221,15 @@ sample_peak_with_IS <- full_join(sample_sql, peak_sql, c("batch_name", "sample_n
 
 We are interested in investigating the acceptance criteria for peak areas for our quantifier and qualifier data. We would like to focus on the standards with an expected concentration of 100 and review the peak area distributions for both quant and qual data. We are going to only focus on the compounds of interest and not internal standard data (internal standards use a different compound_name). Use filter to subset the sample data to only standards with an expected concentration of 100 and then join the sample and peak tables. Plot histograms of the peak areas for quantifier and qualifier ions (separately).
 
-```{r}
+```{r join_data}
 sample_standards <- sample_sql |> 
-  filter(sample_type == "standard", expected_concentration == 100)
-sample_peak_standards <- left_join(sample_standards, peak_sql, by = c("batch_name", "sample_name", "compound_name"))
+  ...
+sample_peak_standards <- ...
 ```
 
-```{r}
-ggplot(sample_peak_standards, aes(peak_area)) +
+```{r plot_joined_data}
+ggplot(..., aes(...)) +
   geom_histogram(binwidth = 1000) +
-  facet_grid(chromatogram_name ~ .)
+  facet_grid(... ~ ...)
 ```
 
