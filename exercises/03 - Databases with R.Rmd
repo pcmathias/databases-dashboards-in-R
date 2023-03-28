@@ -13,7 +13,7 @@ It is helpful to import the external data you may need for an analysis up front,
 
 1. Open the R Markdown file for this lesson: “03 – Databases with R.Rmd”
 2. Run the “setup” chunk of the file. This will ensure the packages we need for this lesson are loaded into our environment. If you receive an error because you weren’t able to load the required packages prior to the course, copy the install.package(c(“DBI”, “RSQLite”)) that is commented out of the setup chunk into your console and execute it.
-3. Run the “import” chunk next. For the other exercises in this lesson we will be using a subset of the peak, sample, and batch data sets to build and query our database.
+3. Run the “import” chunk next. If it does not execute correctly confirm that you have placed the "data" folder with the data for this course into the same folder as this file ("exercises" folder by default within the course repository). For the other exercises in this lesson we will be using the peak, sample, and batch data sets to build and query our database.
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
