@@ -11,8 +11,8 @@ This course covers basic concepts on relational databases, parsing files, dashbo
   - If you don't already have a recent version, install the latest version of RStudio Desktop at https://www.rstudio.com/products/rstudio/download/#download 
 - Open RStudio and confirm you are able to install packages by running `install.packages("tidyverse", dependencies = TRUE)`
 - In addition to the tidyverse set of packages, install additional packages with the following command: `install.packages(c("fs", "janitor", "DBI", "RSQLite", "plotly", "flexdashboard", "DT", "kable"), dependencies = TRUE)`. 
- - If you are running a Windows operating system, install taskscheduleR by running `install.packages("taskscheduleR", dependencies = TRUE)`. 
- - If you are running a Mac or Linux operating system, install cronR by running `install.packages("cronR", dependencies = TRUE)`.
+  - If you are running a Windows operating system, install taskscheduleR by running `install.packages("taskscheduleR", dependencies = TRUE)`. 
+  - If you are running a Mac or Linux operating system, install cronR by running `install.packages("cronR", dependencies = TRUE)`.
 - Optional: If you would like to generate pdf reports with R Markdown and do not already have LaTeX installed on your computer, run `install.packages("tinytex", dependencies = TRUE)`. Then run the following from the RStudio console to install TinyTeX: `tinytex::install_tinytex()`. Note that you may get error messages when installing on Windows that are OK to click through.
 
 ## Accessing/interacting with the course content
