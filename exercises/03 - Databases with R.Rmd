@@ -114,7 +114,7 @@ head(batch_sql, 10) # head function will retrive first rows
 
 **Exercise 3**
 
-Confirm the data that you expect to see is available in the sample and peak tables of your project database. Create table connection objects and view the first 10 rows of each.
+Confirm the data that you expect to see is available in the sample and peak tables of your test database. Create table connection objects and view the first 10 rows of each.
 
 ```{r}
 # connect other tables
