@@ -65,7 +65,7 @@ con <- DBI::dbConnect(odbc::odbc(),
 
 We will build a SQLite database to store our course mass spec data.
 
-1. Create a new SQLite database in a file called "project_data.sqlite" and name the connection object projectdb.
+1. Create a new SQLite database in a file called "test_database.sqlite" and name the connection object testdb.
 2. Create 3 tables - batch, sample, and peak - that correspond to each of the 3 types of files that exist in our data set.
 3. Use the `dbListTables()` function to confirm that the 3 tables have been created.
 
@@ -92,14 +92,14 @@ When not actively using database, disconnect.
 
 ```{r}
 # disconnect from database
-dbDisconnect(projectdb)
+dbDisconnect(testdb)
 ```
 
 After the database connection has been closed, you need to re-connect to continue interacting with it.
 
 ```{r}
 # connect to database - file exists
-projectdb <- dbConnect(RSQLite::SQLite(), "project_data.sqlite")
+testdb <- dbConnect(RSQLite::SQLite(), "test_database.sqlite")
 ```
 
 ## Read Data
@@ -108,7 +108,7 @@ To connect with individual tables within a database, use the `tbl()` function. T
 
 ```{r}
 # access a table
-batch_sql <- tbl(projectdb, "batch")
+batch_sql <- tbl(testdb, "batch")
 head(batch_sql, 10) # head function will retrive first rows
 ```
 
@@ -244,3 +244,10 @@ ggplot(..., aes(...)) +
 ```
 
 **End Exercise**
+
+Disconnect from the test database to end the lesson.
+
+```{r}
+dbDisconnect(testdb)
+```
+
