@@ -6,6 +6,7 @@ This course covers basic concepts on relational databases, parsing files, dashbo
 
 - A laptop or workstation with access to the internet, and the ability to download files is required
 - Complete the following survey so we can better understand your R experience and what you want out of the course: [MSACL Intermediate R Pre-Course Survey](https://forms.gle/YLNtND5ZCjwYFWiV6)
+- A zip file with the data for the course can be downloaded [here](https://drive.google.com/file/d/1nQ_bGhJhzDzgxn4347xLwlwC41jDnV7V/view?usp=sharing)
 - You are welcome to continue using whatever version of R and RStudio you already have on your computer, but you may run into issues running old versions. Our recommendation (if it won't disrupt your working R environment too much):
   - Install the latest version of R by choosing the closest CRAN mirror here at https://cran.r-project.org/mirrors.html and downloading the version for your operating system
   - If you don't already have a recent version, install the latest version of RStudio Desktop at https://www.rstudio.com/products/rstudio/download/#download 
