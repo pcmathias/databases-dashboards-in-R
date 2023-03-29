@@ -49,6 +49,14 @@ connection_object <- dbConnect(drv = RSQLite::SQLite(),
                                dbname = "file_name.sqlite")
 ```
 
+By default, SQLite connections do not preserve date and time data types in R when writing/connecting to the database. Adding an "extended_types = TRUE" argument will preserve these types.
+
+```{r example_SQLite_connection_extended, eval=FALSE}
+connection_object <- dbConnect(drv = RSQLite::SQLite(), 
+                               dbname = "file_name.sqlite",
+                               extended_types = TRUE)
+```
+
 Other types of database may require a significant amount of information to establish a connection. For example, many types of databases require connecting to a separate external server and supplying access credentials.
 
 ```{r example_PostgreSQL_connection, eval=FALSE}
@@ -61,17 +69,39 @@ con <- DBI::dbConnect(odbc::odbc(),
   port = 5432)
 ```
 
+## Write to Table
+
+When a database connection is established, you may want to create a new table or write to an existing table. To write a data frame to a new table, you can use the `dbWriteTable()` function and provide the connection_object, the name of the new table in quotes, and the object that you want to write into the table:
+
+```{r, eval = FALSE}
+dbWriteTable(connection_object, “table_name”, object_name)
+```
+
+You may want to write to an existing table instead. The DBI package provides options to overwrite or append to an existing table.
+
+To append to an existing table:
+
+```{r, eval = FALSE}
+dbWriteTable(connection_object, “table_name”, object_name, append = TRUE)
+```
+
+To overwrite an existing table:
+```{r, eval = FALSE}
+dbWriteTable(connection_object, “table_name”, object_name, overwrite = TRUE)
+```
+
 **Exercise 2**
 
 We will build a SQLite database to store our course mass spec data.
 
-1. Create a new SQLite database in a file called "test_database.sqlite" and name the connection object testdb.
+1. Create a new SQLite database in a file called "test_database.sqlite" and name the connection object testdb. Add the “extended_types = TRUE” argument to ensure dates and times are handled correctly.
 2. Create 3 tables - batch, sample, and peak - that correspond to each of the 3 types of files that exist in our data set.
 3. Use the `dbListTables()` function to confirm that the 3 tables have been created.
 
 ```{r build_db}
 # initialize database connection
 # for SQLite, file is created if it doesn't exist
+testdb <- dbConnect(RSQLite::SQLite(), "test_database.sqlite", extended_types = TRUE)
 ......... <- .........
 ```
 
