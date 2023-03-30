@@ -1,0 +1,95 @@
+---
+title: "MS Lab Dashboard"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(tidyverse)
+library(DBI)
+library(lubridate)
+
+```
+
+```{r db-con} 
+projectdb <- dbConnect(RSQLite::SQLite(), "project_data.sqlite", 
+                       extended_types = TRUE)
+```
+
+```{r db-data}
+batch_sql <- tbl(projectdb, "batch")
+sample_sql <- tbl(projectdb, "sample")
+peak_sql <- tbl(projectdb, "peak")
+```
+
+
+```{r data-prep}
+
+sample_subset <- sample_sql %>% 
+  filter(sample_type == "unknown", concentration > 0) %>% 
+  select(batch_name, sample_name, compound_name, sample_type, concentration)
+
+sample_unknowns <- sample_sql %>%
+  filter(sample_type == "unknown", compound_name == "morphine")
+
+sample_standards <- sample_sql %>% 
+  filter(sample_type == "standard", expected_concentration > 0) %>% 
+  select(collect_date, batch_name, sample_name, compound_name, sample_type, 
+         concentration, ion_ratio, expected_concentration)
+
+sample_peak_standards <- left_join(sample_standards, peak_sql, by = c("batch_name", "sample_name", "compound_name", "collect_date"))
+
+sample_peak_batch_standards <- 
+  left_join(sample_peak_standards, batch_sql,
+              by = c("batch_name", "compound_name", "collect_date")) %>%
+  filter(compound_name == "morphine", chromatogram_name == "quant")
+```
+
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+
+### Sample Concentrations by Compound Name
+
+```{r, fig.width=10}
+
+ggplot(sample_subset) +
+  geom_histogram(aes(x = concentration), binwidth = 10) +
+  facet_grid(compound_name ~ .) +
+  theme_bw()
+
+```
+
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Daily Ion Ratios for Morphine by Instrument Name
+
+```{r}
+ggplot(sample_peak_batch_standards, aes(x = collect_date, y = ion_ratio)) +
+  geom_point(aes(color = instrument_name), position = "jitter") +
+  theme_bw() +
+  theme(legend.position = "top")
+```
+
+### Number of Unknown Samples Analyzed by Day
+
+```{r}
+ggplot(data = sample_unknowns, mapping = aes(x = collect_date)) +
+  geom_bar(stat = "count") +
+  theme_bw()
+```
+
+
+```{r db-discon}
+# disconnect from database
+dbDisconnect(projectdb)
+```
+
+
+
