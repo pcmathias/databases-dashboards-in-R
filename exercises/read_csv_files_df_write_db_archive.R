@@ -14,7 +14,7 @@ library(RSQLite)
 library(janitor)
 
 # set working directory
-setwd("/Users/SHaymond/Documents/MSACL2023_R") # users to modify
+setwd("modify to your filepath") # users to modify
 
 # read multiple csv files into single dataframe by type
 batch_file <- dir_ls("data", glob = "*_b.csv") %>%
@@ -30,7 +30,9 @@ peak_file <- dir_ls("data", glob = "*_p.csv") %>%
   clean_names()
 
 # initialize database connection
-projectdb <- dbConnect(RSQLite::SQLite(), "project_data.sqlite")
+# extended_types argument needed to format datetime fields
+projectdb <- dbConnect(RSQLite::SQLite(), "project_data.sqlite", 
+                       extended_types = TRUE)
 
 # write data to tables
 dbWriteTable(projectdb, "batch", batch_file)
@@ -41,6 +43,7 @@ dbWriteTable(projectdb, "peak", peak_file)
 dbDisconnect(projectdb)
 
 # move processed files to archive folders
+# must have archived folders setup - file_move does not create directories
 dir_ls("data", glob = "*_b.csv") %>%
   map(file_move(path = ., new_path = "data/batch_archive/."))
 
