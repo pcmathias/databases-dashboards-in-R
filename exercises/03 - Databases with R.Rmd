@@ -101,11 +101,10 @@ We will build a SQLite database to store our course mass spec data.
 ```{r build_db}
 # initialize database connection
 # for SQLite, file is created if it doesn't exist
-testdb <- dbConnect(RSQLite::SQLite(), "test_database.sqlite", extended_types = TRUE)
 ......... <- .........
 ```
 
-```{r write_table}
+```{r write_tables}
 # write tables
 dbWriteTable(........., ......., ..........)
 ...
