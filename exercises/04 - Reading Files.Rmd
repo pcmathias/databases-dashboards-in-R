@@ -87,7 +87,7 @@ You might be able to guess what comes next: we'll examine and read in an Excel f
 
 ```{r readxl}
 # complete the function calls and code below
-excel_sheets() 
+excel_sheets() # expecting a file path as input
 
 readxl_load <- read_excel( ) 
 ## insert additional code here
@@ -111,8 +111,10 @@ Very often the first set of operations you may want to perform on a data set tha
 
 Let's take these functions for a spin using our data set. First let's review the first few lines of data after cleaning the column names:
 ```{r janitor}
-library(janitor)
-readxl_load <- read_excel("data/2017-01-06.xlsx")
+
+# readxl_load <- read_excel("data/2017-01-06.xlsx")
+
+head(readxl_load)
 readxl_load_cleaned <- readxl_load %>%
   clean_names()
 head(readxl_load_cleaned)
