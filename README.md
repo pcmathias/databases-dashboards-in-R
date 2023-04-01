@@ -30,6 +30,7 @@ This course is our attempt to integrate a number of already existing outstanding
 
 - Randy Julian and Adam Zabell for their efforts developing the original content for the MSACL intermediate course and for supplying the mass spec data set these courses are built on
 - [R for Data Science](http://r4ds.had.co.nz/index.html), the online textbook by Garrett Grolemund and Hadley Wickham, is invaluable in navigating the tidyverse and learning R in general
+- Data Carpentry for their posted lessons, including this [lesson on databases](https://datacarpentry.org/R-ecology-lesson/05-r-and-databases.html).
 - Blog posts and documentation by [Jenny Bryan](https://github.com/jennybc)
 - [Data Science in the Tidyverse](https://github.com/AmeliaMN/data-science-in-tidyverse), a RStudio course with materials posted online
 - Amy Willis' [Advanced R Course repository](https://github.com/adw96/biostat561) as a resource for understanding content in a longer, advanced R course
