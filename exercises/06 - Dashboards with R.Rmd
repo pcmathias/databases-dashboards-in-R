@@ -11,6 +11,8 @@ library(flexdashboard)
 library(tidyverse)
 library(DBI)
 library(lubridate)
+library(DT)
+library(plotly)
 
 ```
 

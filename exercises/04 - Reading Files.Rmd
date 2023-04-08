@@ -92,7 +92,7 @@ excel_sheets() # expecting a file path as input
 readxl_load <- read_excel( ) 
 ## insert additional code here
 
-readxl_load_subset <- read_excel( , worksheet = , range = )
+readxl_load_subset <- read_excel( , sheet = , range = )
 ## insert additional code here
 ```
 
