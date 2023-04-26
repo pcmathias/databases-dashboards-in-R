@@ -2,6 +2,13 @@
 
 This course covers basic concepts on relational databases, parsing files, dashboards, and interactive visualizations using the R programming language.
 
+### Instructors:
+- Patrick Mathias, MD PhD  
+  University of Washington Medicine  
+
+- Shannon Haymond, PhD  
+  Northwestern University Feinberg School of Medicine
+
 ## Pre-course work/requirements
 
 - A laptop or workstation with access to the internet, and the ability to download files is required
